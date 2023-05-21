@@ -292,20 +292,48 @@ public class AdminLogin extends JFrame {
             passwordField = new JPasswordField();
             passwordField.setBounds(119, 47, 194, 27);
             panel_1.add(passwordField);
+            
+            JPanel panel_3 = new JPanel();
+            panel_3.setBackground(new Color(240, 240, 240));
+            panel_3.setBounds(10, 106, 593, 279);
+            contentPane.add(panel_3);
             passwordField.setVisible(true);
+            
+            JLabel lockLabel = new JLabel();
+            lockLabel.setBounds(146, 30, 300, 218);
+            lockLabel.setBackground(new Color(68, 68, 255));
+            lockLabel.setLayout(new BorderLayout());
+            try {
+                BufferedImage myPicture = ImageIO.read(new File("C:\\Users\\CHRONOS\\eclipse-workspace\\CourseEvalSystem\\src\\guisys\\lock.png"));
+                
+                int desiredWidth = 300;  
+                int desiredHeight = 300;
+                
+                Image resizedImage = myPicture.getScaledInstance(desiredWidth, desiredHeight, Image.SCALE_SMOOTH);
+                ImageIcon icon = new ImageIcon(resizedImage);
+                
+                lockLabel.setIcon(icon);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            panel_3.setLayout(null);
+            panel_3.add(lockLabel);
+
+            
 
             loginButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     String username = usernameField.getText();
                     String password = new String(passwordField.getPassword());
 
-                    if ("admin".equals(username) && "password".equals(password)) {
+                    if ("faithadmin".equals(username) && "adastrafirstasia2023".equals(password)) {
                         usernameField.setEnabled(false);
                         passwordField.setEnabled(false);
                         loginButton.setEnabled(false);
                         
                         JOptionPane.showMessageDialog(null, "Login successful!");
                         
+                        panel_3.setVisible(false);
                         panel_2.setEnabled(true);
                         panel_2.setVisible(true);
                         loadCourses();

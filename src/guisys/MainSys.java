@@ -2,6 +2,7 @@ package guisys;
 
 import guisys.Student;
 import guisys.login;
+import guisys.EvalForm;
 
 import java.util.*;
 import java.awt.BorderLayout;
@@ -59,7 +60,6 @@ public class MainSys extends JFrame {
     private JButton resetButton;
     private final Connection conn = Database.getConnection();
     
-
     public MainSys(Connection conn, Student student) throws IOException, SQLException {
         getContentPane().setForeground(new Color(255, 255, 255));
         setResizable(false);
@@ -143,7 +143,6 @@ public class MainSys extends JFrame {
         subj.setLayout(new BorderLayout());
         subj.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Create the table model with columns for Subject, Professor, and the student number column
         DefaultTableModel tableModel = new DefaultTableModel(new Object[][] {}, new Object[] { "Subject", "Professor", "Answered?" }) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -151,7 +150,7 @@ public class MainSys extends JFrame {
             }
         };
         
-        List<String[]> data = fetchDataFromSupabase(student); // Modify this method to fetch data from Supabase
+        List<String[]> data = fetchDataFromSupabase(student); 
         for (String[] row : data) {
             tableModel.addRow(row);
         }
@@ -223,6 +222,10 @@ public class MainSys extends JFrame {
                     String professor = table.getValueAt(selectedRow, 1).toString();
                     JOptionPane.showMessageDialog(MainSys.this,
                             "Answering the evaluation for:\n\nSubject: " + subject + "\nProfessor: " + professor);
+                    
+                    EvalForm answerFrame = new EvalForm(conn, student);
+	                answerFrame.setVisible(true);
+	                dispose();
                 }
             }
         });

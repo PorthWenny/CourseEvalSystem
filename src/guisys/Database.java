@@ -1,5 +1,6 @@
 package guisys;
 
+import java.util.*;
 import java.sql.*;
 
 public class Database {
@@ -53,4 +54,78 @@ public class Database {
 		}
 		return student;
 	}
+	
+	public static boolean isRatingQuestion(String columnName) throws SQLException {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            conn = getConnection();
+            String query = "SELECT data_type FROM information_schema.columns WHERE table_name = 'evaluation' AND column_name = ?";
+            stmt = conn.prepareStatement(query);
+            stmt.setString(1, columnName);
+            rs = stmt.executeQuery();
+            if (rs.next()) {
+                String dataType = rs.getString("data_type");
+                // Assuming "int2" represents a rating question
+                return dataType.equals("int2");
+            }
+        } finally {
+            closeResultSet(rs);
+            closeStatement(stmt);
+            closeConnection(conn);
+        }
+        return false;
+    }
+
+    public static List<String> getQuestionColumns(Connection conn) throws SQLException {
+        List<String> questionColumns = new ArrayList<>();
+
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            String query = "SELECT column_name FROM information_schema.columns WHERE table_name = 'evaluation' AND column_name NOT IN ('key', 'id', 'subject')";
+            stmt = conn.prepareStatement(query);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                String columnName = rs.getString("column_name");
+                questionColumns.add(columnName);
+            }
+        } finally {
+            closeResultSet(rs);
+            closeStatement(stmt);
+        }
+
+        return questionColumns;
+    }
+
+    private static void closeResultSet(ResultSet rs) {
+    	if (rs != null) {
+            try {
+                rs.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+	}
+
+	private static void closeStatement(Statement stmt) {
+        if (stmt != null) {
+            try {
+                stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private static void closeConnection(Connection conn) {
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

@@ -21,6 +21,7 @@ public class login extends JFrame {
 	private JPanel contentPane;
 	private final JPanel left = new JPanel();
 
+	private String currentStudentId;
 	/**
 	 * Launch the application.
 	 */
@@ -190,6 +191,10 @@ public class login extends JFrame {
 		        final String studentNumber = input_name.getText();
 		        String course = choice.getSelectedItem();
 		        Student student = Database.getStudent(conn, studentNumber);
+		        
+		        // Set the current student ID
+		        currentStudentId = student.getId();
+
 		        try {
 		            if (checkStudentNumber(conn, studentNumber, course)) {
 		                MainSys systemFrame = new MainSys(conn, student);
@@ -249,4 +254,9 @@ public class login extends JFrame {
     	
     	return course_input.equals(course);
     }
+
+	public String getCurrentStudentId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
