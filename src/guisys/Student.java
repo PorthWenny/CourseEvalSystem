@@ -4,14 +4,14 @@ public class Student {
     private String id;
     private String name;
     private String surname;
-    private String course;
+    private int courseId;
     private String level;
 
-    public Student(String id, String name, String surname, String course, String level) {
+    public Student(String id, String name, String surname, int courseId, String level) {
         this.id = id;
         this.name = name;
         this.surname = surname;
-        this.course = course;
+        this.courseId = courseId;
         this.level = level;
     }
 
@@ -39,12 +39,12 @@ public class Student {
         this.surname = surname;
     }
 
-    public String getCourse() {
-        return course;
+    public int getCourseId () {
+        return courseId;
     }
 
-    public void setCourse(String course) {
-        this.course = course;
+    public void setCourseId (int courseId) {
+        this.courseId = courseId;
     }
 
     public String getLevel() {

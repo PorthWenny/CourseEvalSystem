@@ -20,8 +20,7 @@ public class login extends JFrame {
 	private JLabel regclick;
 	private JPanel contentPane;
 	private final JPanel left = new JPanel();
-
-	private String currentStudentId;
+	
 	/**
 	 * Launch the application.
 	 */
@@ -129,7 +128,7 @@ public class login extends JFrame {
         ResultSet tables = metaData.getTables(null, "public", null, new String[] { "TABLE" });
         while (tables.next()) {
             String tableName = tables.getString("TABLE_NAME");
-            if (!tableName.equalsIgnoreCase("students")) {
+            if (tableName.contains("B")) {
                 choice.add(tableName);
             }
         }
@@ -192,9 +191,6 @@ public class login extends JFrame {
 		        String course = choice.getSelectedItem();
 		        Student student = Database.getStudent(conn, studentNumber);
 		        
-		        // Set the current student ID
-		        currentStudentId = student.getId();
-
 		        try {
 		            if (checkStudentNumber(conn, studentNumber, course)) {
 		                MainSys systemFrame = new MainSys(conn, student);
@@ -254,9 +250,4 @@ public class login extends JFrame {
     	
     	return course_input.equals(course);
     }
-
-	public String getCurrentStudentId() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }

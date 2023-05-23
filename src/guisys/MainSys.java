@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -58,9 +57,9 @@ public class MainSys extends JFrame {
     private JTable table;
     private JButton answerButton;
     private JButton resetButton;
-    private final Connection conn = Database.getConnection();
     
     public MainSys(Connection conn, Student student) throws IOException, SQLException {
+    	// this.conn = conn;
         getContentPane().setForeground(new Color(255, 255, 255));
         setResizable(false);
         setBackground(new Color(192, 192, 192));
@@ -130,7 +129,7 @@ public class MainSys extends JFrame {
         welcome.setBounds(20, 10, 559, 64);
         panel.add(welcome);
         
-        JLabel course = new JLabel("Student's Course and Level: " + student.getCourse() + "-" + student.getLevel());
+        JLabel course = new JLabel("Student's Course and Level: BSCS -" + student.getLevel());
         course.setForeground(new Color(255, 255, 255));
         course.setHorizontalAlignment(SwingConstants.LEFT);
         course.setFont(new Font("Roboto Medium", Font.PLAIN, 16));
@@ -150,7 +149,7 @@ public class MainSys extends JFrame {
             }
         };
         
-        List<String[]> data = fetchDataFromSupabase(student); 
+        List<String[]> data = fetchDataFromSupabase(conn, student); 
         for (String[] row : data) {
             tableModel.addRow(row);
         }
@@ -223,7 +222,17 @@ public class MainSys extends JFrame {
                     JOptionPane.showMessageDialog(MainSys.this,
                             "Answering the evaluation for:\n\nSubject: " + subject + "\nProfessor: " + professor);
                     
-                    EvalForm answerFrame = new EvalForm(conn, student);
+                    EvalForm answerFrame = null;
+					try {
+						answerFrame = new EvalForm(conn, student, subject);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (SQLException e1) {
+						System.out.print("Connection closed.");
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 	                answerFrame.setVisible(true);
 	                dispose();
                 }
@@ -257,6 +266,13 @@ public class MainSys extends JFrame {
         buttonPanel.add(resetButton);
 
         subj.add(buttonPanel, BorderLayout.SOUTH);
+        
+        JButton viewButton = new JButton("View Answers");
+        viewButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        	}
+        });
+        buttonPanel.add(viewButton);
 
         table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent event) {
@@ -287,33 +303,28 @@ public class MainSys extends JFrame {
         return UIManager.getIcon("OptionPane.errorIcon");
     }
     
-    private List<String[]> fetchDataFromSupabase(Student student) throws SQLException {
+    private List<String[]> fetchDataFromSupabase(Connection conn, Student student) throws SQLException {
         List<String[]> data = new ArrayList<>();
 
         // Perform the database query and retrieve the data
-        try (Connection connection = conn;
-             Statement statement = connection.createStatement()) {
+        try (Statement statement = conn.createStatement()) {
 
-            String tableName = student.getCourse().toUpperCase();
+            String tableName = Database.getCourse(conn, student.getId());
             String userId = student.getId(); // Assuming the ID is stored in the Student object
 
             // Check if the user's ID column already exists in the table
-            ResultSet columnsResult = connection.getMetaData().getColumns(null, null, tableName, userId);
+            ResultSet columnsResult = conn.getMetaData().getColumns(null, null, tableName, userId);
             boolean idColumnExists = columnsResult.next();
 
             // If the ID column doesn't exist, add it to the table
             if (!idColumnExists) {
                 statement.execute("ALTER TABLE \"" + tableName + "\" ADD COLUMN \"" + userId + "\" INTEGER DEFAULT 0");
             }
-
-            ResultSet resultSet = statement.executeQuery("SELECT subject, prof, \"" + userId + "\" FROM \"" + tableName + "\"");
-
-            while (resultSet.next()) {
-                String subject = resultSet.getString("subject");
-                String professor = resultSet.getString("prof");
-                String answered = resultSet.getString(userId);
-                String[] row = {subject, professor, answered};
-                data.add(row);
+            
+            ArrayList<Subject> subjects = (ArrayList<Subject>) Database.getSubjects(conn, student);
+            for (Subject curr : subjects) {
+            	String[] row = {curr.getName(), curr.getProf(), ""};
+            	data.add(row);
             }
         } catch (SQLException e) {
             // Handle any SQL exceptions
@@ -322,8 +333,4 @@ public class MainSys extends JFrame {
 
         return data;
     }
-
-
-
-
 }

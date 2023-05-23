@@ -353,38 +353,9 @@ public class AdminLogin extends JFrame {
             while (rs.next()) {
                 String tableName = rs.getString("table_name");
                 tableName = tableName.toUpperCase();
-                choice.addItem(tableName);
-            }
-            rs.close();
-            st.close();
-
-            choice.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    String selectedCourse = (String) choice.getSelectedItem();
-                    if (selectedCourse != null) {
-                        refreshTable(selectedCourse.toUpperCase());
-                    }
+                if (tableName.charAt(0) == 'B') {
+                	choice.addItem(tableName);;
                 }
-            });
-
-            String selectedCourse = (String) choice.getSelectedItem();
-            if (selectedCourse != null) {
-                refreshTable(selectedCourse.toUpperCase());
-            }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Failed to fetch courses from the database.");
-            e.printStackTrace();
-        }
-    }private void loadCourses() {
-        choice.removeAllItems();
-        try {
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name <> 'students' COLLATE \"C\"");
-
-            while (rs.next()) {
-                String tableName = rs.getString("table_name");
-                tableName = tableName.toUpperCase();
-                choice.addItem(tableName);
             }
             rs.close();
             st.close();

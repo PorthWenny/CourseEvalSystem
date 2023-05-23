@@ -98,12 +98,7 @@ public class StudentReg extends JFrame {
 
                 if (clickCount == 5) {
                     AdminLogin frame = null;
-					try {
-						frame = new AdminLogin();
-					} catch (SQLException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
+					frame = new AdminLogin();
                     frame.setVisible(true);
 
                     Window window = SwingUtilities.getWindowAncestor(iconLabel);
@@ -135,8 +130,8 @@ public class StudentReg extends JFrame {
         ResultSet tables = metaData.getTables(null, "public", null, new String[] { "TABLE" });
         while (tables.next()) {
             String tableName = tables.getString("TABLE_NAME");
-            if (!tableName.equalsIgnoreCase("students")) {
-                courseChoice.add(tableName);
+            if (tableName.contains("B")) {
+            	courseChoice.add(tableName);
             }
         }
         tables.close();
@@ -344,12 +339,12 @@ public class StudentReg extends JFrame {
                             return;
                         }
 
-                        String query = "INSERT INTO " + table + " (id, name, surname, course, level) VALUES (?, ?, ?, ?, ?)";
+                        String query = "INSERT INTO " + table + " (id, name, surname, \"courseId\", level) VALUES (?, ?, ?, ?, ?)";
                         PreparedStatement statement = conn.prepareStatement(query);
                         statement.setString(1, studentNumber);
                         statement.setString(2, firstName);
                         statement.setString(3, surname);
-                        statement.setString(4, course);
+                        statement.setInt(4, 1);
                         statement.setString(5, yearLevel);
                         int rowsInserted = statement.executeUpdate();
 
